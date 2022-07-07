@@ -1,12 +1,13 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
 import Realm from "realm";
-import { Link } from "../schemas";
+import { Link, Task } from "../schemas";
 import { useAuth } from "./AuthProvider";
 
 const LinksContext = React.createContext(null);
 
 const LinksProvider = ( props ) => {
   const [links, setLinks] = useState([]);
+  const [tasks, setTasks] = useState([]);
   const { user } = useAuth();
 
   // Use a Ref to store the realm rather than the state because it is not
@@ -37,7 +38,8 @@ const LinksProvider = ( props ) => {
             const realm = realmRef.current
             await realm.subscriptions.update(mutableSubs => {
                 mutableSubs.add(
-                realm.objects('Link').filtered(`owner_id == "${user.id}"`),
+                  realm.objects('Link').filtered(`owner_id == "${user.id}"`),
+                  //realm.objects('Task').filtered(`owner_id == "${user.id}"`),
                 ); // subscribe to all Links of the logged in user
             });
         };
@@ -46,13 +48,22 @@ const LinksProvider = ( props ) => {
         const syncLinks = realm.objects("Link");
         let sortedLinks = syncLinks.sorted("name");
         setLinks([...sortedLinks]);
+        
+        // const syncTasks = realm.objects("Link");
+        // let sortedTasks = syncTasks.sorted("name");
+        // setTasks([...sortedTasks]);
 
         // we observe changes on the Links, in case Sync informs us of changes
         // started in other devices (or the cloud)
         sortedLinks.addListener(() => {
-        console.log("Got new data!");
-        setLinks([...sortedLinks]);
+          console.log("Got new links!");
+          setLinks([...sortedLinks]);
         });
+      
+        // sortedTasks.addListener(() => {
+        //   console.log("Got new tasks!");
+        //   setTasks([...sortedTasks]);
+        // });
     });
 
     return () => {
