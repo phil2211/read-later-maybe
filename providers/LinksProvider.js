@@ -22,7 +22,7 @@ const LinksProvider = ( props ) => {
     }
           
     const config = {
-      schema: [Link.schema],
+      schema: [Link.schema, Task.schema],
       sync: {
         user: user,
         flexible: true
@@ -39,8 +39,10 @@ const LinksProvider = ( props ) => {
             await realm.subscriptions.update(mutableSubs => {
                 mutableSubs.add(
                   realm.objects('Link').filtered(`owner_id == "${user.id}"`),
-                  //realm.objects('Task').filtered(`owner_id == "${user.id}"`),
                 ); // subscribe to all Links of the logged in user
+                mutableSubs.add(
+                  realm.objects('Task').filtered(`owner_id == "${user.id}"`),
+                )
             });
         };
         initSubscription();
@@ -84,6 +86,16 @@ const LinksProvider = ( props ) => {
           owner_id: user.id,
         })
       );
+
+      // Create a new task in the same partition -- that is, using the same user id.
+      realm.create(
+        "Task",
+        new Task({
+          title: newLinkName || "New Link",
+          description: newLinkURL || "http://",
+          owner_id: user.id,
+        })
+      );    
     });
   };
 
