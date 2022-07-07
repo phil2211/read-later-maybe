@@ -54,7 +54,7 @@ const LinksProvider = ( props ) => {
         setLinks([...sortedLinks]);
         });
     });
-
+      
     return () => {
       // cleanup function
       closeRealm();
@@ -92,7 +92,7 @@ const LinksProvider = ( props ) => {
         realm.close();
         realmRef.current = null;
         setLinks([]);
-      }  
+      }
   };
 
   // Render the children within the LinksContext's provider. The value contains
@@ -104,7 +104,7 @@ const LinksProvider = ( props ) => {
         createLink,
         deleteLink,
         closeRealm,
-        links
+        links,
       }}
     >
       {props.children}
